@@ -1,0 +1,130 @@
+{% extends "main.html" %}
+
+{% block head %}
+<style>
+    /* Styl dla komunikatów */
+    .error-message {
+        color: red;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla nagłówka */
+    .header {
+        font-family: 'Arial', sans-serif;
+        font-size: 1.5em;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla kontenera informacji o użytkowniku */
+    .user-info {
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla sekcji książek */
+    .book-section {
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla każdej książki */
+    .book {
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 10px;
+    }
+
+    /* Styl dla przycisków */
+    .button {
+        font-family: 'Arial', sans-serif;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .button:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% for message in messages %}
+    <h2 class="error-message">{{ message }}</h2>
+{% endfor %}
+
+<h1 class="header">Obsługa użytkownika</h1>
+
+<div class="user-info">
+    <p>Imię i nazwisko: {{ user_card.first_name }} {{ user_card.last_name }}</p>
+    <p>Email: {{ user_card.email }}</p>
+    <p>Numer karty: {{ user_card.username }}</p>
+</div>
+
+<div class="book-section">
+    {% if reserved_books_not_ready %}
+        <h2>Zarezerwowane książki:</h2>
+        {% for book in reserved_books_not_ready %}
+            <div class="book">
+                <p>ID: {{ book.id }}</p>
+                <p>Tytuł: {{ book.book_title.title }}</p>
+                <p>Autor: {{ book.book_title.author }}</p>
+                <form action="/myadmin/cancelreservation/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="from" value="manageuser">
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <input type="hidden" name="user_card" value="{{ user_card }}">
+                    <input type="submit" value="Anuluj rezerwację" class="button">
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h4>Brak zarezerwowanych książek</h4>
+    {% endif %}
+</div>
+
+<div class="book-section">
+    {% if reserved_books_ready %}
+        <h2>Gotowe do odbioru:</h2>
+        {% for book in reserved_books_ready %}
+            <div class="book">
+                <p>ID: {{ book.id }}</p>
+                <p>Tytuł: {{ book.book_title.title }}</p>
+                <p>Autor: {{ book.book_title.author }}</p>
+                <form action="/myadmin/bookborrowed/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <input type="hidden" name="user_card" value="{{ user_card }}">
+                    <input type="submit" value="Potwierdź odbiór" class="button">
+                </form>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div class="book-section">
+    <h2>Wypożyczone książki:</h2>
+    {% if borrowed_books %}
+        {% for book in borrowed_books %}
+            <div class="book">
+                <p>ID: {{ book.id }}</p>
+                <p>Tytuł: {{ book.book_title.title }}</p>
+                <p>Autor: {{ book.book_title.author }}</p>
+                <p>Termin oddania: {{ book.date_of_return }}</p>
+                <form action="/myadmin/returnbook/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <input type="hidden" name="user_card" value="{{ user_card }}">
+                    <input type="submit" value="Zwróć" class="button">
+                </form>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h4>Brak wypożyczonych książek</h4>
+    {% endif %}
+</div>
+{% endblock %}

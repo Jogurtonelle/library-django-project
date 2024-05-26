@@ -1,0 +1,207 @@
+{% extends "main.html" %}
+
+{% block head %}
+<style>
+    /* Styl dla komunikatów */
+    .error-message {
+        color: red;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla nagłówka */
+    .header {
+        font-family: 'Arial', sans-serif;
+        font-size: 1.5em;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla formularzy */
+    .form {
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla przycisków */
+    .button {
+        font-family: 'Arial', sans-serif;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Styl dla sekcji kategorii promowanych książek */
+    .promotions-section {
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla pojedynczej kategorii promowanych książek */
+    .promotion-category {
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla tytułu kategorii */
+    .category-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    /* Styl dla statusu kategorii */
+    .category-status {
+        margin-bottom: 5px;
+    }
+
+    /* Styl dla przycisków w ramach kategorii */
+    .category-button {
+        margin-right: 10px;
+    }
+
+    /* Styl dla kontenera sekcji książek */
+    .books-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    /* Styl dla kontenera każdej książki */
+    .book-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: calc(20% - 20px);
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        box-sizing: border-box;
+    }
+    
+    .book-container:hover {
+        background-color: #f9f9f9;
+    }
+    
+    /* Styl dla obrazka okładki */
+    .book-container img {
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+    
+    /* Styl dla informacji o książce */
+    .book-details {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .book-details p {
+        margin: 5px 0;
+        font-family: 'Arial', sans-serif;
+        color: #555;
+        text-align: center;
+    }
+    
+    .book-details a {
+        font-size: 1.2em;
+        color: #0066cc;
+        text-decoration: none;
+        font-weight: bold;
+        text-align: center;
+    }
+    
+    .book-details a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Dodatkowy styl dla autorów */
+    .book-details .author {
+        font-style: italic;
+        color: #777;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% for message in messages %}
+    <h2 class="error-message">{{ message }}</h2>
+{% endfor %}
+
+<h1 class="header">Zarządzanie promocjami</h1>
+
+<form action="/myadmin/promotions/" method="post" class="form">
+    {% csrf_token %}
+    <label for="row_name">Nazwa promowanej kategorii:</label>
+    <input type="hidden" name="action" value="add_row">
+    <input type="text" id="row_name" name="row_name">
+    <input type="submit" value="Dodaj nową kategorię promowanych książek" class="button">
+</form>
+
+<div class="promotions-section">
+    {% for key, row in data.items %}
+        <div class="promotion-category">
+            <h2 class="category-title">{{ key.title }}</h2>
+            {% if key.is_active %}
+                <p class="category-status" style="color:green">Aktywne</p>
+                <form action="/myadmin/promotions/" method="post" class="form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="deactivate">
+                    <input type="hidden" name="row_name" value="{{ key.title }}">
+                    <input type="submit" value="Dezaktywuj" class="button category-button">
+                </form>
+            {% else %}
+                <p class="category-status" style="color:red">Nieaktywne</p>
+                <form action="/myadmin/promotions/" method="post" class="form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="activate">
+                    <input type="hidden" name="row_name" value="{{ key.title }}">
+                    <input type="submit" value="Aktywuj" class="button category-button">
+                </form>
+            {% endif %}
+            <form action="/myadmin/promotions/" method="post" class="form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="remove_row">
+                <input type="hidden" name="row_name" value="{{ key.title }}">
+                <input type="submit" value="Usuń kategorię promowanych książek" class="button category-button">
+            </form>
+            <form action="/myadmin/promotions/" method="post" class="form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_book">
+                <input type="hidden" name="row_name" value="{{ key.title }}">
+                <label for="book_isbn">ISBN dodawanej książki:</label>
+                <input type="text" id="book_isbn" name="book_isbn">
+                <input type="submit" value="Dodaj książkę" class="button category-button">
+            </form>
+            <ul class="books-section">
+                {% for book in row %}
+                    <li class="book-container">
+                        <img src="{{ book.cover_url }}" alt="cover" style="width: 100px;">
+                        <div class="book-details">
+                            <a href="/book/{{book.isbn}}" class="book-title">{{ book.title }}</a>
+                            <p class="author">{{ book.author }}</p>
+                        </div>
+                        <form action="/myadmin/promotions/" method="post" class="form">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove_book">
+                            <input type="hidden" name="row_name" value="{{ key.title }}">
+                            <input type="hidden" name="book_isbn" value="{{ book.isbn }}">
+                            <input type="submit" value="Usuń z promowanych" class="button category-button">
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+            
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

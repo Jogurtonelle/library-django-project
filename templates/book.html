@@ -1,0 +1,173 @@
+{% extends "main.html" %}
+
+{% block head %}
+<style>
+    /* Styl dla kontenera z tekstem i obrazkiem */
+.text-plus-image {
+    display: grid;
+    grid-template-columns: 7fr 2fr;
+    grid-gap: 10%;
+    margin: 2% 5%;
+}
+
+/* Styl dla okładki książki */
+.book-cover {
+    aspect-ratio: auto;
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Styl dla nagłówka książki */
+.text-plus-image h1 {
+    font-family: 'Arial', sans-serif;
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Styl dla autora */
+.text-plus-image a {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.2em;
+    color: #0066cc;
+    text-decoration: none;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.text-plus-image a:hover {
+    text-decoration: underline;
+}
+
+/* Styl dla reszty tekstu */
+.text-plus-image p {
+    font-family: 'Arial', sans-serif;
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+/* Styl dla przycisku */
+button {
+    background-color: #0066cc;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Arial', sans-serif;
+}
+
+button:hover {
+    background-color: #005bb5;
+}
+
+/* Styl dla separatora */
+.separator {
+    width: 90%;
+    height: 2px;
+    background-color: #ddd;
+    margin: 40px auto;
+}
+
+/* Styl dla sekcji rezerwacji */
+.reservation-section {
+    margin: 2% 5%;
+}
+
+.reservation-section h2 {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Styl dla kafelka rezerwacji */
+.reservation-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reservation-card p {
+    font-family: 'Arial', sans-serif;
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.reservation-card form {
+    margin-top: 10px;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="text-plus-image">
+    <div>
+        <h1>{{ book_title.title }}</h1>
+        <a href="/search/?search={{book_title.author}}">{{ book_title.author }}</a>
+        <p>{{ book_title.isbn }}</p>
+        <p>{{ book_title.description }}</p>
+        {% if request.user.is_authenticated %}
+            {% if not is_favourite %}
+                <form action="/manage-favs/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add">
+                    <button name="isbn" value="{{book_title.isbn}}">Dodaj do ulubionych</button>
+                </form>
+            {% else %}
+                <p>Już dodano do ulubionych</p>
+            {% endif %}
+        {% else %}
+        <p>Zaloguj się, aby dodać książkę do ulubionych</p>
+        {% endif %}
+    </div>
+    <div>
+        <img src="{{ book_title.cover_url }}" alt="book image" class="book-cover">
+    </div>
+</div>
+
+<div class="separator"></div>
+
+<div class="reservation-section">
+    <h2>Zarezerwuj książkę</h2>
+    {% for branch in branches %}
+        {% if branch == 0 %}
+            <h2>Biblioteka Główna</h2>
+        {% else %}
+            <h2>Filia nr {{ branch }}</h2>
+        {% endif %}
+
+        {% for book_copy in book_copies %}
+            {% if book_copy.library_branch_id == branch %}
+                <div class="reservation-card">
+                    <p>Rok wydania: {{ book_copy.year }}</p>
+                    {% if book_copy.is_available %}
+                        <p>Dostępna</p>
+                        {% if request.user.is_authenticated %}
+                        <form action="/reserve/" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="book_copy_id" value="{{ book_copy.id }}">
+                            <input type="submit" value="Zarezerwuj">
+                        </form>
+                        {% else %}
+                            <p>Zaloguj się, aby zarezerwować książkę</p>
+                        {% endif %}
+                    {% else %}
+                        <p>Niedostępna</p>
+                        <p>Przewidywana data zwrotu: {{ book_copy.date_of_return }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "main.html" %}
+
+{% block head %}
+<style>
+    /* Styl dla komunikatów */
+    .message {
+        color: red;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla nagłówka formularza */
+    .form-header {
+        font-family: 'Arial', sans-serif;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    /* Styl dla formularza */
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        background-color: #f9f9f9;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-label {
+        font-family: 'Arial', sans-serif;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .form-input {
+        font-family: 'Arial', sans-serif;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        width: calc(100% - 22px);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .form-submit {
+        font-family: 'Arial', sans-serif;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .form-submit:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div>
+    {% for message in messages %}
+        <h2 class="message">{{ message }}</h2>
+    {% endfor %}
+</div>
+
+<div class="form-container">
+    <h1 class="form-header">Dodaj książkę</h1>
+    <form action="/myadmin/addbook/" method="post">
+        {% csrf_token %}
+        <label for="title" class="form-label">Tytuł:</label><br>
+        <input type="text" id="title" name="title" class="form-input" required><br>
+        <label for="author" class="form-label">Autor:</label><br>
+        <input type="text" id="author" name="author" class="form-input" required><br>
+        <label for="isbn" class="form-label">ISBN:</label><br>
+        <input type="text" id="isbn" name="isbn" class="form-input" required><br>
+        <label for="description" class="form-label">Opis:</label><br>
+        <textarea rows="5" id="description" name="description" class="form-input"></textarea>
+        <label for="cover_url" class="form-label">Link do okładki:</label><br>
+        <input type="text" id="cover_url" name="cover_url" class="form-input" required><br>
+        <input type="submit" value="Dodaj" class="form-submit">
+    </form>
+</div>
+{% endblock %}

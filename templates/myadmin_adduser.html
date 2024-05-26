@@ -1,0 +1,101 @@
+{% extends "main.html" %}
+
+{% block head %}
+<style>
+    /* Styl dla komunikatów */
+    .message {
+        color: red;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla nagłówka formularza */
+    .form-header {
+        font-family: 'Arial', sans-serif;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    /* Styl dla formularza */
+    .form-container {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: #f9f9f9;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-label {
+        font-family: 'Arial', sans-serif;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .form-input {
+        font-family: 'Arial', sans-serif;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        width: calc(100% - 22px);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .form-select {
+        font-family: 'Arial', sans-serif;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    .form-submit {
+        font-family: 'Arial', sans-serif;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .form-submit:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div>
+    {% for message in messages %}
+        <h2 class="message">{{ message }}</h2>
+    {% endfor %}
+</div>
+
+<div class="form-container">
+    <h1 class="form-header">Dodaj użytkownika</h1>
+    <form action="/myadmin/adduser/" method="post">
+        {% csrf_token %}
+        <label for="name" class="form-label">Imię:</label><br>
+        <input type="text" id="name" name="name" class="form-input" required><br>
+        <label for="surname" class="form-label">Nazwisko:</label><br>
+        <input type="text" id="surname" name="surname" class="form-input" required><br>
+        <label for="email" class="form-label">Email:</label><br>
+        <input type="email" id="email" name="email" class="form-input" required><br>
+        <label for="card" class="form-label">Numer karty:</label><br>
+        <input type="text" id="card" name="card" class="form-input" required><br>
+        <label for="role" class="form-label">Rola:</label><br>
+        <select id="role" name="role" class="form-select">
+            <option value="user">Użytkownik</option>
+            <option value="admin">Administrator</option>
+        </select><br>
+        <input type="submit" value="Dodaj" class="form-submit">
+    </form>
+</div>
+{% endblock %}

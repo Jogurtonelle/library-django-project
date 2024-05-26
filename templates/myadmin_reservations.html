@@ -1,0 +1,108 @@
+{% extends "main.html" %}
+
+{% block head %}
+<style>
+    /* Styl dla komunikatów */
+    .error-message {
+        color: red;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla nagłówka */
+    .header {
+        font-family: 'Arial', sans-serif;
+        font-size: 1.5em;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla kontenera informacji o użytkowniku */
+    .user-info {
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla sekcji książek */
+    .book-section {
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla każdej książki */
+    .book {
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 10px;
+    }
+
+    /* Styl dla przycisków */
+    .button {
+        font-family: 'Arial', sans-serif;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .button:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% for message in messages %}
+    <h2 class="error-message">{{ message }}</h2>
+{% endfor %}
+
+<h2 class="header">Książki w trakcie przygotowania:</h2>
+<div class="book-section">
+    {% if reserved_books_not_ready %}
+        <ul>
+            {% for reserved_book_not_ready in reserved_books_not_ready %}
+            <li class="book">
+                <a href="/book/{{ reserved_book_not_ready.book_title.isbn }}">{{ reserved_book_not_ready.book_title.title }}</a>
+                <p>Filia: {{ reserved_book_not_ready.library_branch_id }}</p>
+                <p>Użytkownik: {{ reserved_book_not_ready.borrower }}</p>
+                <p>ID książki: {{ reserved_book_not_ready.id }}</p>
+                <form action="/myadmin/reservationready/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ reserved_book_not_ready.id }}">
+                    <input type="hidden" name="user_card" value="{{ reserved_book_not_ready.borrower }}">
+                    <input type="submit" value="Potwierdź przygotowanie rezerwacji" class="button">
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Brak książek do przygotowania</p>
+    {% endif %}
+</div>
+
+<h2 class="header">Książki gotowe do odebrania:</h2>
+<div class="book-section">
+    {% if reserved_books_ready %}
+        <ul>
+            {% for reserved_book_ready in reserved_books_ready %}
+            <li class="book">
+                <a href="/book/{{ reserved_book_ready.book_title.isbn }}">{{ reserved_book_ready.book_title.title }}</a>
+                <p>Filia: {{ reserved_book_ready.library_branch_id }}</p>
+                <p>Użytkownik: {{ reserved_book_ready.borrower.username }}</p>
+                <p>ID: {{ reserved_book_ready.id }}</p>
+                <form action="/myadmin/cancelreservation/" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ reserved_book_ready.id }}">
+                    <input type="hidden" name="user_card" value="{{ reserved_book_ready.borrower }}">
+                    <input type="submit" value="Anuluj rezerwację" class="button">
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Brak książek do odebrania</p>
+    {% endif %}
+</div>
+
+{% endblock %}

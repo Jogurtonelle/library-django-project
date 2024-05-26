@@ -1,0 +1,84 @@
+{% extends 'main.html' %}
+
+{% block head %}
+<style>
+    /* Styl dla komunikatów */
+    .messages {
+        color: red;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 20px;
+    }
+
+    /* Styl dla nagłówka */
+    .login-header {
+        font-family: 'Arial', sans-serif;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    /* Styl dla formularza logowania */
+    .login-form {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: #f9f9f9;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-form label {
+        font-family: 'Arial', sans-serif;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .login-form input[type="text"],
+    .login-form input[type="password"],
+    .login-form input[type="submit"] {
+        font-family: 'Arial', sans-serif;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        display: block;
+        width: calc(100% - 22px);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .login-form input[type="submit"] {
+        background-color: #0066cc;
+        color: white;
+        cursor: pointer;
+    }
+
+    .login-form input[type="submit"]:hover {
+        background-color: #005bb5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div>
+    <h1 class="login-header">Logowanie</h1>
+</div>
+<div class="login-form">
+    {% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        <label for="username">Nazwa użytkownika:</label>
+        <input type="text" name="username" placeholder="Nazwa użytkownika">
+        <label for="password">Hasło:</label>
+        <input type="password" name="password" placeholder="Hasło">
+        <button type="submit">Zaloguj</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "main.html" %}
+
+{% block head %}
+<style>
+    /* Styl dla przycisków */
+    .admin-button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        font-size: 16px;
+        font-family: 'Arial', sans-serif;
+        text-align: center;
+        text-decoration: none;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .admin-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<button class="admin-button" onclick="window.location.href='/myadmin/addbook'">Dodaj książkę</button>
+<button class="admin-button" onclick="window.location.href='/myadmin/addcopy'">Dodaj egzemplarz książki</button>
+<button class="admin-button" onclick="window.location.href='/myadmin/adduser'">Załóż konto nowego czytelnika</button>
+<button class="admin-button" onclick="window.location.href='/myadmin/getuser'">Obsłuż czytelnika</button>
+<button class="admin-button" onclick="window.location.href='/myadmin/promotions'">Edytuj promowane książki</button>
+<button class="admin-button" onclick="window.location.href='/myadmin/reservations'">Przeglądaj rezerwacje</button>
+{% endblock %}

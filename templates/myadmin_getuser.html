@@ -1,0 +1,82 @@
+{% extends "main.html" %}
+
+{% block head %}
+<style>
+/* Styl dla komunikatów o błędach */
+.error-message {
+    color: red;
+    font-family: 'Arial', sans-serif;
+    margin-bottom: 10px;
+}
+
+/* Styl dla formularza */
+.search-form {
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Styl dla etykiet formularza */
+.form-label {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+/* Styl dla pól tekstowych formularza */
+.form-input {
+    font-family: 'Arial', sans-serif;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: calc(100% - 22px);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Styl dla przycisku formularza */
+.form-submit {
+    font-family: 'Arial', sans-serif;
+    padding: 10px 20px; 
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Zmiana koloru przycisku po najechaniu */
+.form-submit:hover {
+    background-color: #0056b3;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% for message in messages %}
+    <h2 class="error-message">{{ message }}</h2>
+{% endfor %}
+
+<form id="form" class="search-form">
+    {% csrf_token %}
+    <label for="user_card" class="form-label">Wpisz numer karty użytkownika:</label><br>
+    <input type="text" id="user_card" name="user_card" class="form-input" required><br>
+    <input type="submit" value="Znajdź" class="form-submit">
+</form>
+
+
+<script>
+    document.getElementById("form").addEventListener("submit", function(event) {
+        event.preventDefault();
+        var cardNum = document.getElementById("user_card").value;
+        window.location.href = "/myadmin/manageuser/" + cardNum;
+      });
+</script>
+
+{% endblock %}
